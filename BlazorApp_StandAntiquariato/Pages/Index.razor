@@ -1,0 +1,74 @@
+﻿@page "/"
+
+<h1 class="mb-4">Archivio Stand Antiquariato</h1>
+
+<button type="button" class="btn btn-primary" @onclick="CaricaArchivioStand_Click">Visualizza tabella</button>
+
+
+@if (mostraTabella)
+{
+	<table class="table table-hover table-sm mt-4">
+		<thead>
+			<tr>
+				<th scope="col">#</th>
+				<th scope="col">Zona espositiva</th>
+				<th scope="col">Superficie stand</th>
+				<th scope="col">Nome antiquario</th>
+				<th scope="col">Cognome antiquario</th>
+				<th scope="col">Al coperto</th>
+				<th scope="col">Data di inizio esposizione</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (Stand item in listaStand)
+			{
+				<tr class="align-middle">
+					<th scope="row">@item.IdStand</th>
+					<td>Zona @item.ZonaEsposizione</td>
+					<td>@item.Superficie m<sup>2</sup></td>
+					<td>@item.NomeAntiquario</td>
+					<td>@item.CognomeAntiquario</td>
+					<td>@(item.Coperto ? "Sì" : "No")</td>
+					<td>@item.DataInizio.ToShortDateString()</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+@code {
+	List<Stand> listaStand = new List<Stand>();
+	bool mostraTabella = false;
+
+	private void CaricaArchivioStand_Click()
+	{
+		listaStand.Clear();
+		string connString = "Data Source=Data/stand_antiquariato.db;";
+		SqliteConnection myConn = new SqliteConnection(connString);
+		SqliteCommand myCommand = new SqliteCommand("SELECT * FROM tblStands;");
+		SqliteDataReader myDr;
+		myCommand.Connection = myConn;
+
+		myConn.Open();
+
+		myDr = myCommand.ExecuteReader();
+
+		while (myDr.Read())
+		{
+			Stand x = new Stand
+				{
+					IdStand = Convert.ToInt32(myDr["IdStand"]),
+					ZonaEsposizione = Convert.ToChar(myDr["ZonaEsposizione"]),
+					Superficie = Convert.ToInt32(myDr["Superficie"]),
+					NomeAntiquario = Convert.ToString(myDr["NomeAntiquario"]),
+					CognomeAntiquario = Convert.ToString(myDr["CognomeAntiquario"]),
+					Coperto = Convert.ToBoolean(myDr["Coperto"]),
+					DataInizio = Convert.ToDateTime(myDr["DataInizio"])
+				};
+			listaStand.Add(x);
+		}
+		mostraTabella = true;
+
+		myConn.Close();
+	}
+}
