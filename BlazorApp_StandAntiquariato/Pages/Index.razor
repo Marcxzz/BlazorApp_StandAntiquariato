@@ -1,44 +1,45 @@
 ﻿@page "/"
 
-<h3 class="mb-4">Archivio Stand Antiquariato</h3>
+<h3 class="mb-4">Elenco Stand Antiquariato</h3>
 
-<button type="button" class="btn btn-primary" @onclick="CaricaArchivioStand_Click">Visualizza tabella</button>
-
-
-@if (mostraTabella)
-{
-	<table class="table table-hover table-sm mt-4">
-		<thead>
-			<tr>
-				<th scope="col">#</th>
-				<th scope="col">Zona espositiva</th>
-				<th scope="col">Superficie stand</th>
-				<th scope="col">Nome</th>
-				<th scope="col">Cognome</th>
-				<th scope="col">Al coperto</th>
-				<th scope="col">Data di inizio esposizione</th>
+<table class="table table-hover table-sm mt-4">
+	<thead>
+		<tr>
+			<th scope="col">#</th>
+			<th scope="col">Zona espositiva</th>
+			<th scope="col">Superficie stand</th>
+			<th scope="col">Nome</th>
+			<th scope="col">Cognome</th>
+			<th scope="col">Al coperto</th>
+			<th scope="col">Data di inizio esposizione</th>
+			<th scope="col"></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (Stand item in listaStand)
+		{
+			<tr class="align-middle">
+				<th scope="row">@item.IdStand</th>
+				<td>Zona @item.ZonaEsposizione</td>
+				<td>@item.Superficie m<sup>2</sup></td>
+				<td>@item.NomeAntiquario</td>
+				<td>@item.CognomeAntiquario</td>
+				<td>@(item.Coperto ? "Sì" : "No")</td>
+				<td>@item.DataInizio.ToShortDateString()</td>
+				<td><a href="stand/@item.IdStand" class="text-muted " title="Vedi dettagli dello stand @item.IdStand"><i class="bi bi-box-arrow-up-right"></i></a></td>
 			</tr>
-		</thead>
-		<tbody>
-			@foreach (Stand item in listaStand)
-			{
-				<tr class="align-middle">
-					<th scope="row">@item.IdStand</th>
-					<td>Zona @item.ZonaEsposizione</td>
-					<td>@item.Superficie m<sup>2</sup></td>
-					<td>@item.NomeAntiquario</td>
-					<td>@item.CognomeAntiquario</td>
-					<td>@(item.Coperto ? "Sì" : "No")</td>
-					<td>@item.DataInizio.ToShortDateString()</td>
-				</tr>
-			}
-		</tbody>
-	</table>
-}
+		}
+	</tbody>
+</table>
 
 @code {
 	List<Stand> listaStand = new List<Stand>();
-	bool mostraTabella = false;
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		CaricaArchivioStand_Click();
+	}
 
 	private void CaricaArchivioStand_Click()
 	{
@@ -67,7 +68,6 @@
 				};
 			listaStand.Add(x);
 		}
-		mostraTabella = true;
 
 		myConn.Close();
 	}

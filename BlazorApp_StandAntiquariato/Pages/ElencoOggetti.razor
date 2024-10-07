@@ -2,43 +2,45 @@
 
 <h3 class="mb-4">Elenco Oggetti</h3>
 
-<button type="button" class="btn btn-primary" @onclick="CaricaElencoOggetti_Click">Visualizza elenco oggetti</button>
-
-@if (mostraTabella)
-{
-	<table class="table table-hover table-sm mt-4">
-		<thead>
-			<tr>
-				<th scope="col">#</th>
-				<th scope="col">Tipo</th>
-				<th scope="col">Materiale principale</th>
-				<th scope="col">Epoca</th>
-				<th scope="col">Prezzo</th>
-				<th scope="col">Stand</th>
+<table class="table table-hover table-sm m-0">
+	<thead>
+		<tr>
+			<th scope="col">#</th>
+			<th scope="col">Tipo</th>
+			<th scope="col">Materiale principale</th>
+			<th scope="col">Epoca</th>
+			<th scope="col">Prezzo</th>
+			<th scope="col">Stand</th>
+			<th scope="col"></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (Oggetto item in listaOggetti)
+		{
+			<tr class="align-middle">
+				<th scope="row">@item.idOggetto</th>
+				<td>@item.tipo</td>
+				<td>@(item.materialePrincipale == "" ? "Sconosciuto" : item.materialePrincipale)</td>
+				<td>@(item.epoca == "" ? "Sconosciuta" : item.epoca)</td>
+				<td>@item.prezzoEsposto €</td>
+				<td>@item.standId</td>
+				<td><a href="stand/@item.standId" class="text-muted " title="Vedi dettagli dello stand @item.standId"><i class="bi bi-box-arrow-up-right"></i></a></td>
 			</tr>
-		</thead>
-		<tbody>
-			@foreach (Oggetto item in listaOggetti)
-			{
-				<tr class="align-middle">
-					<th scope="row">@item.idOggetto</th>
-					<td>@item.tipo</td>
-					<td>@(item.materialePrincipale == "" ? "Sconosciuto" : item.materialePrincipale)</td>
-					<td>@(item.epoca == "" ? "Sconosciuta" : item.epoca)</td>
-					<td>@item.prezzoEsposto €</td>
-					<td>@item.standId</td>
-				</tr>
-			}
-		</tbody>
-	</table>
-}
+		}
+	</tbody>
+</table>
 
 @code {
-    List<Oggetto> listaOggetti = new List<Oggetto>();
-    bool mostraTabella = false;
+	List<Oggetto> listaOggetti = new List<Oggetto>();
 
-    private void CaricaElencoOggetti_Click()
-    {
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		CaricaElencoOggetti_Click();
+	}
+
+	private void CaricaElencoOggetti_Click()
+	{
 		listaOggetti.Clear();
 		string connString = "Data Source=Data/dbStandAntiquariato.db;";
 		SqliteConnection myConn = new SqliteConnection(connString);
@@ -63,7 +65,6 @@
 				};
 			listaOggetti.Add(x);
 		}
-		mostraTabella = true;
 
 		myConn.Close();
     }
