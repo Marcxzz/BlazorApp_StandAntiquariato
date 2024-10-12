@@ -1,0 +1,63 @@
+﻿@page "/oggetto/{IdOggetto:int}"
+
+<h3 class="mb-4">Dettagli oggetto @IdOggetto</h3>
+
+@if (oggetto != null)
+{
+	<div class="card w-25">
+		<img src="img/@oggetto.percorsoImmagine" class="card-img-top" alt="Immagine oggetto @IdOggetto">
+		<div class="card-body">
+			<p>ID oggetto: @oggetto.idOggetto</p>
+			<p>Tipo: @oggetto.tipo</p>
+			<p>Materiale principale: @(oggetto.materialePrincipale == "" ? "Sconosciuto" : oggetto.materialePrincipale)</p>
+			<p>Epoca: @(oggetto.epoca == "" ? "Sconosciuta" : oggetto.epoca)</p>
+			<p>Prezzo: @oggetto.prezzoEsposto €</p>
+			<p>Si trova nello stand @oggetto.standId</p>
+		</div>
+	</div>
+} else
+{
+	<div class="alert alert-danger" role="alert">
+		<i class="bi bi-exclamation-circle-fill"></i>
+		Non sono stati trovati oggetti esposti per questo stand.
+	</div>
+}
+
+@code {
+	[Parameter]
+	public int IdOggetto { get; set; }
+	Oggetto? oggetto = null;
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		CaricaArchivioStand_Click();
+	}
+
+	private void CaricaArchivioStand_Click()
+	{
+		string connString = "Data Source=Data/dbStandAntiquariato.db;";
+		SqliteConnection myConn = new SqliteConnection(connString);
+		SqliteCommand myCommand = new SqliteCommand($"SELECT * FROM tblOggetti WHERE idOggetto={IdOggetto};");
+		SqliteDataReader myDr;
+		myCommand.Connection = myConn;
+
+		myConn.Open();
+
+		myDr = myCommand.ExecuteReader();
+
+		myDr.Read();
+		oggetto = new Oggetto
+			{
+				idOggetto = Convert.ToInt32(myDr["idOggetto"]),
+				tipo = Convert.ToString(myDr["tipo"]),
+				materialePrincipale = Convert.ToString(myDr["materialePrincipale"]),
+				epoca = Convert.ToString(myDr["epoca"]),
+				prezzoEsposto = Convert.ToDecimal(myDr["prezzoEsposto"]),
+				standId = Convert.ToInt32(myDr["standId"]),
+				percorsoImmagine = Convert.ToString(myDr["percorsoImmagine"])
+			};
+
+		myConn.Close();
+	}
+}
